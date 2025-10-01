@@ -232,7 +232,7 @@ export default function ShopCatalog() {
           <Label className="text-gray-700">Filter by Category</Label>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-full md:w-64 border-amber-200 mt-2">
-              <SelectValue />
+              <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>

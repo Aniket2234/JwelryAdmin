@@ -251,7 +251,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const category = req.query.category as string | undefined;
+      console.log(`📦 Fetching products with category filter: "${category}"`);
       const products = await getShopProducts(shop.mongodbUri, category);
+      console.log(`📦 Found ${products.length} products`);
       res.json(products);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch products" });

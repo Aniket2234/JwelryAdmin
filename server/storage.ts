@@ -192,13 +192,30 @@ export async function getShopCategories(mongoUri: string): Promise<Category[]> {
 // Helper function to get products from shop's MongoDB
 export async function getShopProducts(mongoUri: string, category?: string): Promise<Product[]> {
   const db = await connectToShopDB(mongoUri);
-  const filter = category && category !== "all" ? { category } : {};
+  
+  // Use case-insensitive regex for category matching to handle any case mismatches
+  const filter = category && category !== "all" 
+    ? { category: new RegExp(`^${category}$`, 'i') } 
+    : {};
+  
+  console.log(`🔍 MongoDB filter:`, JSON.stringify(filter));
+  console.log(`🔍 Category parameter:`, category);
   
   const products = await db
     .collection("products")
     .find(filter)
     .sort({ displayOrder: 1 })
     .toArray();
+
+  console.log(`🔍 Products found: ${products.length}`);
+  if (products.length > 0) {
+    console.log(`🔍 Sample product categories:`, products.slice(0, 3).map(p => p.category));
+  } else if (category && category !== "all") {
+    // If no products found with filter, log all unique categories to help debug
+    const allProducts = await db.collection("products").find({}).toArray();
+    const uniqueCategories = Array.from(new Set(allProducts.map(p => p.category)));
+    console.log(`🔍 All unique categories in DB:`, uniqueCategories);
+  }
 
   return products.map((prod) => ({
     ...prod,
