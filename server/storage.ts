@@ -154,7 +154,23 @@ export async function connectToShopDB(mongoUri: string): Promise<Db> {
   const client = new MongoClient(mongoUri);
   await client.connect();
   
-  const dbName = mongoUri.split('/').pop()?.split('?')[0] || 'shop_database';
+  // Extract database name from URI
+  // URI format: mongodb+srv://...mongodb.net/DATABASE_NAME?params
+  const uriParts = mongoUri.split('/');
+  const lastPart = uriParts[uriParts.length - 1];
+  let dbName = lastPart?.split('?')[0] || '';
+  
+  // If database name is empty or missing, use the default database from the connection
+  if (!dbName || dbName.trim() === '') {
+    console.warn('⚠️  No database name found in MongoDB URI. Using default database.');
+    console.warn('💡 Please update your shop MongoDB URI to include the database name:');
+    console.warn('   mongodb+srv://...mongodb.net/DATABASE_NAME?params');
+    // Let MongoDB driver use the default database (admin or test)
+    // This will likely fail to find collections
+    dbName = 'test';
+  }
+  
+  console.log(`🔌 Connecting to shop database: "${dbName}"`);
   return client.db(dbName);
 }
 
