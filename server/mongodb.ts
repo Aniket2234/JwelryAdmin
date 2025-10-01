@@ -8,11 +8,11 @@ export async function connectToMongoDB(): Promise<Db> {
     return db;
   }
 
-  const mongoUri = process.env.ADMIN_MONGODB_URI;
+  const mongoUri = process.env.ADMIN_MONGODB_URI || process.env.MONGODB_URI;
   
   if (!mongoUri) {
     throw new Error(
-      "ADMIN_MONGODB_URI environment variable is not set. Please add it to your .env file."
+      "ADMIN_MONGODB_URI or MONGODB_URI environment variable is not set. Please add it to your .env file."
     );
   }
 
