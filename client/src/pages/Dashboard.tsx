@@ -2,9 +2,16 @@ import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocation } from 'wouter';
-import { Store, Plus, Settings, LogOut, BookOpen, TrendingUp, Package, Tag, Activity } from 'lucide-react';
+import { Store, Plus, Settings, LogOut, BookOpen, TrendingUp, Package, Tag, Activity, TrendingDown } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+
+interface MetalRates {
+  gold_24k: string;
+  gold_22k: string;
+  silver: string;
+  lastUpdated: string;
+}
 
 interface Shop {
   _id: string;
@@ -40,6 +47,12 @@ export default function Dashboard() {
   // Fetch analytics using react-query
   const { data: analytics, isLoading: analyticsLoading } = useQuery<Analytics>({
     queryKey: ['/api/analytics'],
+  });
+
+  // Fetch live metal rates (no authentication required)
+  const { data: metalRates, isLoading: ratesLoading } = useQuery<MetalRates>({
+    queryKey: ['/api/rates'],
+    refetchInterval: 60 * 60 * 1000, // Refetch every hour
   });
 
   const isLoading = shopsLoading || analyticsLoading;
@@ -102,6 +115,74 @@ export default function Dashboard() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Live Metal Rates Section */}
+        {metalRates && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-amber-600" />
+              Live Gold & Silver Rates (India)
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <Card className="border-amber-300 bg-gradient-to-br from-yellow-50 via-amber-50 to-white shadow-lg" data-testid="card-gold-24k">
+                <CardHeader className="pb-3">
+                  <CardDescription className="text-gray-600 font-medium">24K Gold</CardDescription>
+                  <CardTitle className="text-4xl font-bold text-amber-600 flex items-center gap-2">
+                    <TrendingUp className="w-8 h-8 text-amber-500" />
+                    {metalRates.gold_24k}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">Per 10 grams</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    IBJA Rates • {new Date(metalRates.lastUpdated).toLocaleTimeString('en-IN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-orange-300 bg-gradient-to-br from-orange-50 via-amber-50 to-white shadow-lg" data-testid="card-gold-22k">
+                <CardHeader className="pb-3">
+                  <CardDescription className="text-gray-600 font-medium">22K Gold</CardDescription>
+                  <CardTitle className="text-4xl font-bold text-orange-600 flex items-center gap-2">
+                    <TrendingUp className="w-8 h-8 text-orange-500" />
+                    {metalRates.gold_22k}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">Per 10 grams</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    IBJA Rates • {new Date(metalRates.lastUpdated).toLocaleTimeString('en-IN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-gray-300 bg-gradient-to-br from-gray-50 via-slate-50 to-white shadow-lg" data-testid="card-silver">
+                <CardHeader className="pb-3">
+                  <CardDescription className="text-gray-600 font-medium">Silver</CardDescription>
+                  <CardTitle className="text-4xl font-bold text-gray-600 flex items-center gap-2">
+                    <TrendingDown className="w-8 h-8 text-gray-500" />
+                    {metalRates.silver}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">Per 1 kilogram</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Estimated • {new Date(metalRates.lastUpdated).toLocaleTimeString('en-IN', { 
+                      hour: '2-digit', 
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
         {/* Analytics Section */}
         {analytics && analytics.totalShops > 0 && (
           <div className="mb-8">

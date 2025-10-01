@@ -65,7 +65,8 @@ export async function scrapeIBJARates(): Promise<IBJARates> {
     const gold24kPer10g = gold24kPerGram * 10;
     const gold22kPer10g = gold22kPerGram * 10;
 
-    silverPerKg = 95000;
+    const silverPricePerGram = gold24kPerGram * 0.0126;
+    silverPerKg = Math.round(silverPricePerGram * 1000);
 
     cachedRates = {
       gold_24k: `₹ ${gold24kPer10g.toLocaleString("en-IN")}`,
