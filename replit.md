@@ -1,0 +1,128 @@
+# Jewelry Shop Admin Panel
+
+## Overview
+
+This is a modern jewelry shop admin panel built with React and Express. The application allows administrators to manage multiple jewelry shops from a centralized dashboard. Admins can add shops (with their MongoDB connection details), view and manage each shop's product catalog, and perform all CRUD operations on products and categories. The application features a beautiful responsive design with golden, white, and pastel color theme.
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
+
+## System Architecture
+
+### Frontend Architecture
+
+**Technology Stack:**
+- React 18 with TypeScript for type safety
+- Vite as the build tool and development server
+- Wouter for client-side routing (lightweight alternative to React Router)
+- TanStack Query (React Query) for server state management and caching
+- Tailwind CSS for styling with shadcn/ui component library
+- Framer Motion for animations and transitions
+
+**Design Decisions:**
+- **Component-based UI**: Uses shadcn/ui (Radix UI primitives) for accessible, customizable components
+- **Custom theming**: Golden, white, and pastel color theme throughout the application
+- **Authentication flow**: Login and signup pages with protected routes
+- **Responsive layout**: Mobile-first approach with responsive dashboard and forms
+- **State management**: TanStack Query handles all server state, React Context for authentication
+- **File organization**: Pages (Login, Signup, Dashboard, ShopForm, ShopCatalog, Settings), components, and UI components are clearly separated
+
+**Key Pages:**
+- Login/Signup: Authentication pages with golden theme and "Made by Airavata Technologies" branding
+- Dashboard: Main page showing all user's shops with add/edit/delete/catalog actions
+- Shop Form: Add or edit shop details (name, image, MongoDB URI, description, contact info)
+- Shop Catalog: View and manage products for a specific shop with full CRUD operations
+- Settings: Admin account settings and profile management
+
+### Backend Architecture
+
+**Technology Stack:**
+- Express.js with TypeScript
+- MongoDB with native MongoDB driver for data persistence
+- Zod for runtime validation and schema definition
+- bcryptjs for password hashing
+- crypto.randomUUID for secure session IDs
+
+**API Structure:**
+- RESTful API endpoints under `/api` prefix
+- **Authentication**: signup, login, logout, me (current user)
+- **Shop Management**: CRUD operations scoped by user ownership
+- **Shop Catalog**: Fetch categories and products from shop's MongoDB
+- **Product Management**: CRUD operations on products within shop catalogs
+
+**Design Decisions:**
+- **Validation**: Zod schemas in shared directory ensure type safety between client and server
+- **Authorization**: All shop operations are scoped by ownerId to ensure multi-tenant isolation
+- **Error handling**: Centralized error responses with appropriate HTTP status codes
+- **Session management**: In-memory session storage with UUID-based session IDs
+- **Database abstraction**: Storage interface pattern for clean separation of concerns
+
+### Data Storage
+
+**Admin Panel Database (ADMIN_MONGODB_URI):**
+- Stores admin panel data (users, shops)
+- Collections: users, shops
+- Indexed fields: email (unique), ownerId, createdAt, name
+
+**Schema Design:**
+- **Users**: email, password (hashed), name, createdAt
+- **Shops**: ownerId, name, imageUrl, mongodbUri, description, address, phone, email, website, createdAt, updatedAt
+
+**Shop Databases (Individual MongoDB URIs):**
+- Each shop has its own MongoDB database
+- Shop owners provide MongoDB connection URIs when adding shops
+- Collections: categories, products
+- The admin panel connects to shop databases to fetch and manage catalog data
+
+### Security Implementation
+
+**Authentication & Authorization:**
+- Password hashing with bcryptjs
+- Secure session IDs using crypto.randomUUID
+- Protected routes on frontend using React Context
+- Authorization middleware on all API endpoints
+- Multi-tenant isolation: users can only access their own shops
+
+**Data Validation:**
+- Zod schemas validate all user inputs
+- MongoDB URI validation (must start with mongodb:// or mongodb+srv://)
+- Authorization checks on all shop and catalog operations
+
+### External Dependencies
+
+**UI Component Library:**
+- @radix-ui/* components for accessible UI primitives (dialogs, dropdowns, selects, etc.)
+- shadcn/ui configuration for consistent component styling
+
+**Database Services:**
+- MongoDB Atlas or compatible MongoDB service (via ADMIN_MONGODB_URI for admin panel)
+- Individual shop MongoDB databases (via shop-specific URIs)
+
+**Development Tools:**
+- Replit-specific plugins for development experience
+- Vite plugins: error overlay, cartographer, dev banner
+- TypeScript for type checking across the stack
+
+**Build and Deployment:**
+- Vite builds the frontend to `dist/public`
+- esbuild bundles the backend to `dist/index.js`
+- Environment variables: ADMIN_MONGODB_URI (admin panel database)
+
+## How to Use
+
+1. **Sign Up**: Create an admin account on the signup page
+2. **Login**: Sign in with your credentials
+3. **Add Shops**: Click "Add New Shop" on the dashboard
+   - Enter shop name, image URL, and other details
+   - **Important**: Provide the shop's MongoDB connection URI (mongodb:// or mongodb+srv://)
+   - The system will connect to this database to fetch products and categories
+4. **Manage Catalog**: Click "Catalog" on any shop to view and manage products
+   - View products by category
+   - Add, edit, or delete products
+   - All changes are saved to the shop's MongoDB database
+5. **Settings**: Manage your admin account settings
+
+## Branding
+
+"Made by Airavata Technologies" branding appears on all pages of the application.
