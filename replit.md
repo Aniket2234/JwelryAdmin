@@ -30,7 +30,7 @@ Preferred communication style: Simple, everyday language.
 
 **Key Pages:**
 - Login/Signup: Authentication pages with golden theme and "Made by Airavata Technologies" branding
-- Dashboard: Main page showing all user's shops with add/edit/delete/catalog actions
+- Dashboard: Main page showing all user's shops with add/edit/delete/catalog actions, **plus live gold and silver rates for India**
 - Shop Form: Add or edit shop details (name, image, MongoDB URI, description, contact info)
 - Shop Catalog: View and manage products for a specific shop with full CRUD operations
 - Settings: Admin account settings and profile management
@@ -50,6 +50,7 @@ Preferred communication style: Simple, everyday language.
 - **Shop Management**: CRUD operations scoped by user ownership
 - **Shop Catalog**: Fetch categories and products from shop's MongoDB
 - **Product Management**: CRUD operations on products within shop catalogs
+- **Metal Rates**: Public endpoint `/api/rates` that scrapes live gold and silver rates from IBJA (India Bullion & Jewellers Association)
 
 **Design Decisions:**
 - **Validation**: Zod schemas in shared directory ensure type safety between client and server
@@ -98,6 +99,14 @@ Preferred communication style: Simple, everyday language.
 **Database Services:**
 - MongoDB Atlas or compatible MongoDB service (via ADMIN_MONGODB_URI for admin panel)
 - Individual shop MongoDB databases (via shop-specific URIs)
+
+**Live Metal Rates:**
+- Scrapes real-time gold rates from IBJA (India Bullion & Jewellers Association) at https://ibja.co/
+- 24K Gold and 22K Gold rates (per 10 grams) updated from IBJA homepage
+- Silver rate (per 1 kg) calculated based on gold-to-silver ratio
+- Hourly caching to minimize scraping requests (free forever, no API keys required)
+- Public API endpoint `/api/rates` accessible without authentication
+- cheerio library for HTML parsing and web scraping
 
 **Development Tools:**
 - Replit-specific plugins for development experience
