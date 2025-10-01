@@ -130,6 +130,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Analytics endpoint - get dashboard statistics
+  app.get("/api/analytics", requireAuth, async (req: any, res) => {
+    try {
+      const shops = await getStorage().getAllShops(req.userId);
+      
+      let totalProducts = 0;
+      let totalCategories = 0;
+      const categorySet = new Set<string>();
+      
+      // Fetch product and category counts from each shop
+      for (const shop of shops) {
+        try {
+          const products = await getShopProducts(shop.mongodbUri);
+          totalProducts += products.length;
+          
+          const categories = await getShopCategories(shop.mongodbUri);
+          categories.forEach(cat => categorySet.add(cat.name));
+          totalCategories += categories.length;
+        } catch (error) {
+          console.error(`Failed to fetch data for shop ${shop.name}:`, error);
+        }
+      }
+
+      // Sort shops by createdAt descending to get most recent first
+      const recentShops = [...shops]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
+
+      res.json({
+        totalShops: shops.length,
+        totalProducts,
+        totalCategories,
+        uniqueCategories: categorySet.size,
+        recentShops,
+      });
+    } catch (error) {
+      console.error("Analytics error:", error);
+      res.status(500).json({ message: "Failed to fetch analytics" });
+    }
+  });
+
   // Shop management endpoints
   app.get("/api/shops", requireAuth, async (req: any, res) => {
     try {

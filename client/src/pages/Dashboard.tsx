@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocation } from 'wouter';
-import { Store, Plus, Settings, LogOut, BookOpen } from 'lucide-react';
+import { Store, Plus, Settings, LogOut, BookOpen, TrendingUp, Package, Tag, Activity } from 'lucide-react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface Shop {
   _id: string;
@@ -19,59 +20,52 @@ interface Shop {
   updatedAt: string;
 }
 
+interface Analytics {
+  totalShops: number;
+  totalProducts: number;
+  totalCategories: number;
+  uniqueCategories: number;
+  recentShops: Shop[];
+}
+
 export default function Dashboard() {
   const [, setLocation] = useLocation();
-  const { user, sessionId, logout } = useAuth();
-  const [shops, setShops] = useState<Shop[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, logout } = useAuth();
 
-  useEffect(() => {
-    fetchShops();
-  }, []);
+  // Fetch shops using react-query
+  const { data: shops = [], isLoading: shopsLoading } = useQuery<Shop[]>({
+    queryKey: ['/api/shops'],
+  });
 
-  const fetchShops = async () => {
-    try {
-      const response = await fetch('/api/shops', {
-        headers: {
-          Authorization: `Bearer ${sessionId}`,
-        },
-      });
+  // Fetch analytics using react-query
+  const { data: analytics, isLoading: analyticsLoading } = useQuery<Analytics>({
+    queryKey: ['/api/analytics'],
+  });
 
-      if (response.ok) {
-        const data = await response.json();
-        setShops(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch shops:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isLoading = shopsLoading || analyticsLoading;
 
   const handleLogout = async () => {
     await logout();
     setLocation('/login');
   };
 
+  // Delete shop mutation
+  const deleteShopMutation = useMutation({
+    mutationFn: async (shopId: string) => {
+      return await apiRequest('DELETE', `/api/shops/${shopId}`);
+    },
+    onSuccess: () => {
+      // Invalidate both shops and analytics queries to refetch fresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/shops'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/analytics'] });
+    },
+  });
+
   const handleDeleteShop = async (shopId: string) => {
     if (!confirm('Are you sure you want to delete this shop?')) {
       return;
     }
-
-    try {
-      const response = await fetch(`/api/shops/${shopId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${sessionId}`,
-        },
-      });
-
-      if (response.ok) {
-        setShops(shops.filter(shop => shop._id !== shopId));
-      }
-    } catch (error) {
-      console.error('Failed to delete shop:', error);
-    }
+    deleteShopMutation.mutate(shopId);
   };
 
   return (
@@ -108,11 +102,121 @@ export default function Dashboard() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Analytics Section */}
+        {analytics && analytics.totalShops > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-amber-600" />
+              Analytics Overview
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-white" data-testid="card-analytics-shops">
+                <CardHeader className="pb-2">
+                  <CardDescription className="text-gray-600">Total Shops</CardDescription>
+                  <CardTitle className="text-3xl text-amber-600 flex items-center gap-2">
+                    <Store className="w-6 h-6" />
+                    {analytics.totalShops}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs text-gray-500">Actively managed</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white" data-testid="card-analytics-products">
+                <CardHeader className="pb-2">
+                  <CardDescription className="text-gray-600">Total Products</CardDescription>
+                  <CardTitle className="text-3xl text-orange-600 flex items-center gap-2">
+                    <Package className="w-6 h-6" />
+                    {analytics.totalProducts}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs text-gray-500">Across all shops</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-white" data-testid="card-analytics-categories">
+                <CardHeader className="pb-2">
+                  <CardDescription className="text-gray-600">Total Categories</CardDescription>
+                  <CardTitle className="text-3xl text-amber-600 flex items-center gap-2">
+                    <Tag className="w-6 h-6" />
+                    {analytics.totalCategories}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs text-gray-500">{analytics.uniqueCategories} unique types</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white" data-testid="card-analytics-activity">
+                <CardHeader className="pb-2">
+                  <CardDescription className="text-gray-600">Average Products</CardDescription>
+                  <CardTitle className="text-3xl text-orange-600 flex items-center gap-2">
+                    <Activity className="w-6 h-6" />
+                    {analytics.totalShops > 0 ? Math.round(analytics.totalProducts / analytics.totalShops) : 0}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs text-gray-500">Per shop</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity Section */}
+            {analytics.recentShops.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <Activity className="w-6 h-6 text-amber-600" />
+                  Recent Activity
+                </h2>
+                <Card className="border-amber-200">
+                  <CardContent className="pt-6">
+                    <div className="space-y-4">
+                      {analytics.recentShops.map((shop) => (
+                        <div
+                          key={shop._id}
+                          className="flex items-center justify-between p-3 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer"
+                          onClick={() => setLocation(`/shops/${shop._id}/catalog`)}
+                          data-testid={`activity-shop-${shop._id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={shop.imageUrl}
+                              alt={shop.name}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                            <div>
+                              <h3 className="font-semibold text-gray-800">{shop.name}</h3>
+                              <p className="text-sm text-gray-600">
+                                Added {new Date(shop.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-amber-300 text-amber-700 hover:bg-amber-200"
+                            data-testid={`button-view-shop-${shop._id}`}
+                          >
+                            View Catalog
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Your Jewelry Shops</h2>
           <Button
             onClick={() => setLocation('/shops/new')}
             className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+            data-testid="button-add-shop"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add New Shop
@@ -125,7 +229,7 @@ export default function Dashboard() {
             <p className="mt-4 text-gray-600">Loading shops...</p>
           </div>
         ) : shops.length === 0 ? (
-          <Card className="border-amber-200">
+          <Card className="border-amber-200" data-testid="card-empty-shops">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Store className="w-16 h-16 text-amber-300 mb-4" />
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No shops yet</h3>
@@ -133,6 +237,7 @@ export default function Dashboard() {
               <Button
                 onClick={() => setLocation('/shops/new')}
                 className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                data-testid="button-add-first-shop"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Your First Shop
@@ -142,16 +247,17 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {shops.map((shop) => (
-              <Card key={shop._id} className="border-amber-200 hover:shadow-lg transition-shadow">
+              <Card key={shop._id} className="border-amber-200 hover:shadow-lg transition-shadow" data-testid={`card-shop-${shop._id}`}>
                 <CardHeader>
                   <div className="aspect-video w-full overflow-hidden rounded-lg bg-gray-100 mb-4">
                     <img
                       src={shop.imageUrl}
                       alt={shop.name}
                       className="w-full h-full object-cover"
+                      data-testid={`img-shop-${shop._id}`}
                     />
                   </div>
-                  <CardTitle className="text-xl text-gray-800">{shop.name}</CardTitle>
+                  <CardTitle className="text-xl text-gray-800" data-testid={`text-shop-name-${shop._id}`}>{shop.name}</CardTitle>
                   <CardDescription className="line-clamp-2">
                     {shop.description || 'No description'}
                   </CardDescription>
@@ -170,6 +276,7 @@ export default function Dashboard() {
                       size="sm"
                       onClick={() => setLocation(`/shops/${shop._id}/catalog`)}
                       className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                      data-testid={`button-catalog-${shop._id}`}
                     >
                       <BookOpen className="w-4 h-4 mr-2" />
                       Catalog
@@ -179,6 +286,7 @@ export default function Dashboard() {
                       variant="outline"
                       onClick={() => setLocation(`/shops/${shop._id}/edit`)}
                       className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                      data-testid={`button-edit-${shop._id}`}
                     >
                       Edit
                     </Button>
@@ -187,6 +295,7 @@ export default function Dashboard() {
                       variant="outline"
                       onClick={() => handleDeleteShop(shop._id)}
                       className="border-red-300 text-red-700 hover:bg-red-50"
+                      data-testid={`button-delete-${shop._id}`}
                     >
                       Delete
                     </Button>
