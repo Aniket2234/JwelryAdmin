@@ -12,6 +12,7 @@ import {
 } from "@shared/schema";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
+import { scrapeIBJARates } from "./ibja-scraper";
 
 // In-memory session storage (replace with proper session management in production)
 const sessions = new Map<string, string>(); // sessionId -> userId
@@ -25,6 +26,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error("Failed to connect to MongoDB:", error);
     throw error;
   }
+
+  // Public endpoint for gold and silver rates (no authentication required)
+  app.get("/api/rates", async (req, res) => {
+    try {
+      const rates = await scrapeIBJARates();
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching rates:", error);
+      res.status(500).json({ 
+        gold_24k: "₹ N/A",
+        gold_22k: "₹ N/A",
+        silver: "₹ N/A",
+        lastUpdated: new Date(),
+      });
+    }
+  });
 
   // Middleware to check authentication
   const requireAuth = (req: any, res: any, next: any) => {
