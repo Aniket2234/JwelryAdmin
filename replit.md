@@ -126,3 +126,42 @@ Preferred communication style: Simple, everyday language.
 ## Branding
 
 "Made by Airavata Technologies" branding appears on all pages of the application.
+
+## Replit Setup Instructions
+
+### Environment Configuration
+
+This application has been configured to run on Replit with the following setup:
+
+**Development Mode:**
+- The application runs using `npm run dev` which starts both the backend (Express) and frontend (Vite) on port 5000
+- Vite is configured to work with Replit's proxy using `allowedHosts: true`
+- The server binds to `0.0.0.0:5000` to accept connections from Replit's proxy
+- Environment variables are loaded from the `.env` file using `dotenv`
+
+**Production Deployment:**
+- Configured for autoscale deployment (stateless web app)
+- Build command: `npm run build` (builds both frontend and backend)
+- Run command: `npm run start` (runs the bundled production server)
+
+**Database Configuration:**
+The application looks for MongoDB connection URI in this order:
+1. `ADMIN_MONGODB_URI` environment variable (preferred for Replit Secrets)
+2. `MONGODB_URI` environment variable (fallback, used by .env file)
+
+For production deployment, it's recommended to add `ADMIN_MONGODB_URI` to Replit Secrets instead of using the .env file.
+
+**Important Notes:**
+- The `.env` file is now in `.gitignore` to prevent accidental exposure of credentials
+- For production, use Replit Secrets to securely store `ADMIN_MONGODB_URI`
+- The application requires a MongoDB database - use MongoDB Atlas or any MongoDB-compatible service
+
+### Recent Changes (Replit Setup)
+
+**October 1, 2025:**
+- Added dotenv to load environment variables from .env file
+- Updated MongoDB connection to check both ADMIN_MONGODB_URI and MONGODB_URI
+- Configured Vite to work with Replit's proxy (allowedHosts: true)
+- Set up workflow to run on port 5000 with webview output
+- Configured deployment for autoscale with proper build and run commands
+- Added .env to .gitignore for security
