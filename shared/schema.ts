@@ -69,6 +69,15 @@ export const productSchema = z.object({
   featured: z.boolean().default(false),
   inStock: z.boolean().default(true),
   displayOrder: z.number().default(0),
+  // New fields
+  subImages: z.array(z.string()).default([]),
+  isNewArrival: z.boolean().default(false),
+  isNewTrend: z.boolean().default(false),
+  gender: z.string().optional(),
+  occasion: z.string().optional(),
+  purity: z.string().optional(),
+  stone: z.string().optional(),
+  weight: z.string().optional(),
 });
 
 export const insertProductSchema = productSchema.omit({ _id: true });
