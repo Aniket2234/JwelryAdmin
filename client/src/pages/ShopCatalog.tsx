@@ -499,63 +499,94 @@ export default function ShopCatalog() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="gender">Gender</Label>
-                <Input
-                  id="gender"
+                <Select
                   value={productForm.gender}
-                  onChange={(e) => setProductForm({ ...productForm, gender: e.target.value })}
-                  placeholder="e.g., Women, Men, Unisex"
-                  className="border-amber-200"
-                  data-testid="input-gender"
-                />
+                  onValueChange={(value) => setProductForm({ ...productForm, gender: value })}
+                >
+                  <SelectTrigger className="border-amber-200" data-testid="select-gender">
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Men" data-testid="selectitem-gender-men">Men</SelectItem>
+                    <SelectItem value="Women" data-testid="selectitem-gender-women">Women</SelectItem>
+                    <SelectItem value="Kids" data-testid="selectitem-gender-kids">Kids</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="occasion">Occasion</Label>
-                <Input
-                  id="occasion"
+                <Select
                   value={productForm.occasion}
-                  onChange={(e) => setProductForm({ ...productForm, occasion: e.target.value })}
-                  placeholder="e.g., Bridal, Casual, Party"
-                  className="border-amber-200"
-                  data-testid="input-occasion"
-                />
+                  onValueChange={(value) => setProductForm({ ...productForm, occasion: value })}
+                >
+                  <SelectTrigger className="border-amber-200" data-testid="select-occasion">
+                    <SelectValue placeholder="Select occasion" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Daily Wear" data-testid="selectitem-occasion-dailywear">Daily Wear</SelectItem>
+                    <SelectItem value="Bridal" data-testid="selectitem-occasion-bridal">Bridal</SelectItem>
+                    <SelectItem value="Office Wear" data-testid="selectitem-occasion-officewear">Office Wear</SelectItem>
+                    <SelectItem value="Festive" data-testid="selectitem-occasion-festive">Festive</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="purity">Purity</Label>
-                <Input
-                  id="purity"
+                <Label htmlFor="purity">Purity / Karat</Label>
+                <Select
                   value={productForm.purity}
-                  onChange={(e) => setProductForm({ ...productForm, purity: e.target.value })}
-                  placeholder="e.g., 18K, 22K, 24K"
-                  className="border-amber-200"
-                  data-testid="input-purity"
-                />
+                  onValueChange={(value) => setProductForm({ ...productForm, purity: value })}
+                >
+                  <SelectTrigger className="border-amber-200" data-testid="select-purity">
+                    <SelectValue placeholder="Select purity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="22K" data-testid="selectitem-purity-22k">22K</SelectItem>
+                    <SelectItem value="18K" data-testid="selectitem-purity-18k">18K</SelectItem>
+                    <SelectItem value="14K" data-testid="selectitem-purity-14k">14K</SelectItem>
+                    <SelectItem value="24K" data-testid="selectitem-purity-24k">24K</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="stone">Stone</Label>
-                <Input
-                  id="stone"
+                <Label htmlFor="stone">Stone / Gem</Label>
+                <Select
                   value={productForm.stone}
-                  onChange={(e) => setProductForm({ ...productForm, stone: e.target.value })}
-                  placeholder="e.g., Diamond, Ruby, Emerald"
-                  className="border-amber-200"
-                  data-testid="input-stone"
-                />
+                  onValueChange={(value) => setProductForm({ ...productForm, stone: value })}
+                >
+                  <SelectTrigger className="border-amber-200" data-testid="select-stone">
+                    <SelectValue placeholder="Select stone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Diamond" data-testid="selectitem-stone-diamond">Diamond</SelectItem>
+                    <SelectItem value="Emerald" data-testid="selectitem-stone-emerald">Emerald</SelectItem>
+                    <SelectItem value="Ruby" data-testid="selectitem-stone-ruby">Ruby</SelectItem>
+                    <SelectItem value="Sapphire" data-testid="selectitem-stone-sapphire">Sapphire</SelectItem>
+                    <SelectItem value="Pearl" data-testid="selectitem-stone-pearl">Pearl</SelectItem>
+                    <SelectItem value="None" data-testid="selectitem-stone-none">None</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="weight">Weight</Label>
-              <Input
-                id="weight"
+              <Label htmlFor="weight">Weight Range</Label>
+              <Select
                 value={productForm.weight}
-                onChange={(e) => setProductForm({ ...productForm, weight: e.target.value })}
-                placeholder="e.g., 20g+, 15g"
-                className="border-amber-200"
-                data-testid="input-weight"
-              />
+                onValueChange={(value) => setProductForm({ ...productForm, weight: value })}
+              >
+                <SelectTrigger className="border-amber-200" data-testid="select-weight">
+                  <SelectValue placeholder="Select weight range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="<5g" data-testid="selectitem-weight-under5">{"<5g"}</SelectItem>
+                  <SelectItem value="5g-10g" data-testid="selectitem-weight-5to10">5g-10g</SelectItem>
+                  <SelectItem value="10g-20g" data-testid="selectitem-weight-10to20">10g-20g</SelectItem>
+                  <SelectItem value="20g+" data-testid="selectitem-weight-over20">20g+</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex gap-4 flex-wrap">
