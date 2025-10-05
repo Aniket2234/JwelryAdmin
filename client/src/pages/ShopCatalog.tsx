@@ -137,10 +137,6 @@ export default function ShopCatalog() {
   const handleOpenDialog = (product?: Product) => {
     if (product) {
       setEditingProduct(product);
-      // Find matching category (case-insensitive) to ensure dropdown shows correct value
-      const matchingCategory = categories.find(
-        cat => cat.name.toLowerCase() === product.category.toLowerCase()
-      );
       
       setProductForm({
         name: product.name,
@@ -148,7 +144,7 @@ export default function ShopCatalog() {
         price: product.price,
         originalPrice: product.originalPrice || 0,
         imageUrl: product.imageUrl,
-        category: matchingCategory?.name || product.category,
+        category: product.category,
         tags: product.tags.join(', '),
         featured: product.featured,
         inStock: product.inStock,
