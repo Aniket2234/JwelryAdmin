@@ -26,12 +26,10 @@ interface Product {
   imageUrl: string;
   category: string;
   tags: string[];
-  featured: boolean;
   inStock: boolean;
   displayOrder: number;
   subImages: string[];
   isNewArrival: boolean;
-  isNewTrend: boolean;
   isExclusive: boolean;
   isTrending: boolean;
   gender?: string;
@@ -62,12 +60,10 @@ export default function ShopCatalog() {
     imageUrl: '',
     category: '',
     tags: '',
-    featured: false,
     inStock: true,
     displayOrder: 0,
     subImages: ['', '', '', ''],
     isNewArrival: false,
-    isNewTrend: false,
     isExclusive: false,
     isTrending: false,
     gender: '',
@@ -146,7 +142,6 @@ export default function ShopCatalog() {
         imageUrl: product.imageUrl,
         category: product.category,
         tags: product.tags.join(', '),
-        featured: product.featured,
         inStock: product.inStock,
         displayOrder: product.displayOrder,
         subImages: [
@@ -156,7 +151,6 @@ export default function ShopCatalog() {
           product.subImages?.[3] || '',
         ],
         isNewArrival: product.isNewArrival || false,
-        isNewTrend: product.isNewTrend || false,
         isExclusive: product.isExclusive || false,
         isTrending: product.isTrending || false,
         gender: product.gender || '',
@@ -175,12 +169,10 @@ export default function ShopCatalog() {
         imageUrl: '',
         category: categories[0]?.slug || '',
         tags: '',
-        featured: false,
         inStock: true,
         displayOrder: 0,
         subImages: ['', '', '', ''],
         isNewArrival: false,
-        isNewTrend: false,
         isExclusive: false,
         isTrending: false,
         gender: '',
@@ -352,11 +344,6 @@ export default function ShopCatalog() {
                     <span className={`px-2 py-1 rounded ${product.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`} data-testid={`status-stock-${product._id}`}>
                       {product.inStock ? 'In Stock' : 'Out of Stock'}
                     </span>
-                    {product.featured && (
-                      <span className="px-2 py-1 rounded bg-amber-100 text-amber-700" data-testid={`status-featured-${product._id}`}>
-                        Featured
-                      </span>
-                    )}
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -608,17 +595,6 @@ export default function ShopCatalog() {
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="featured"
-                  checked={productForm.featured}
-                  onChange={(e) => setProductForm({ ...productForm, featured: e.target.checked })}
-                  className="border-amber-300"
-                  data-testid="checkbox-featured"
-                />
-                <Label htmlFor="featured">Featured</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
                   id="isNewArrival"
                   checked={productForm.isNewArrival}
                   onChange={(e) => setProductForm({ ...productForm, isNewArrival: e.target.checked })}
@@ -626,17 +602,6 @@ export default function ShopCatalog() {
                   data-testid="checkbox-newarrival"
                 />
                 <Label htmlFor="isNewArrival">New Arrival</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isNewTrend"
-                  checked={productForm.isNewTrend}
-                  onChange={(e) => setProductForm({ ...productForm, isNewTrend: e.target.checked })}
-                  className="border-amber-300"
-                  data-testid="checkbox-newtrend"
-                />
-                <Label htmlFor="isNewTrend">New Trend</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <input
