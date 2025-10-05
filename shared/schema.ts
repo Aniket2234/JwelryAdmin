@@ -73,6 +73,8 @@ export const productSchema = z.object({
   subImages: z.array(z.string()).default([]),
   isNewArrival: z.boolean().default(false),
   isNewTrend: z.boolean().default(false),
+  isExclusive: z.boolean().default(false),
+  isTrending: z.boolean().default(false),
   gender: z.string().optional(),
   occasion: z.string().optional(),
   purity: z.string().optional(),

@@ -32,6 +32,8 @@ interface Product {
   subImages: string[];
   isNewArrival: boolean;
   isNewTrend: boolean;
+  isExclusive: boolean;
+  isTrending: boolean;
   gender?: string;
   occasion?: string;
   purity?: string;
@@ -66,6 +68,8 @@ export default function ShopCatalog() {
     subImages: ['', '', '', ''],
     isNewArrival: false,
     isNewTrend: false,
+    isExclusive: false,
+    isTrending: false,
     gender: '',
     occasion: '',
     purity: '',
@@ -157,6 +161,8 @@ export default function ShopCatalog() {
         ],
         isNewArrival: product.isNewArrival || false,
         isNewTrend: product.isNewTrend || false,
+        isExclusive: product.isExclusive || false,
+        isTrending: product.isTrending || false,
         gender: product.gender || '',
         occasion: product.occasion || '',
         purity: product.purity || '',
@@ -179,6 +185,8 @@ export default function ShopCatalog() {
         subImages: ['', '', '', ''],
         isNewArrival: false,
         isNewTrend: false,
+        isExclusive: false,
+        isTrending: false,
         gender: '',
         occasion: '',
         purity: '',
@@ -633,6 +641,28 @@ export default function ShopCatalog() {
                   data-testid="checkbox-newtrend"
                 />
                 <Label htmlFor="isNewTrend">New Trend</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isExclusive"
+                  checked={productForm.isExclusive}
+                  onChange={(e) => setProductForm({ ...productForm, isExclusive: e.target.checked })}
+                  className="border-amber-300"
+                  data-testid="checkbox-exclusive"
+                />
+                <Label htmlFor="isExclusive">Exclusive</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isTrending"
+                  checked={productForm.isTrending}
+                  onChange={(e) => setProductForm({ ...productForm, isTrending: e.target.checked })}
+                  className="border-amber-300"
+                  data-testid="checkbox-trending"
+                />
+                <Label htmlFor="isTrending">Trending</Label>
               </div>
             </div>
             <div className="space-y-2">
