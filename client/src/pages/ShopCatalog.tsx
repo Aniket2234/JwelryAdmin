@@ -173,7 +173,7 @@ export default function ShopCatalog() {
         price: 0,
         originalPrice: 0,
         imageUrl: '',
-        category: categories[0]?.name || '',
+        category: categories[0]?.slug || '',
         tags: '',
         featured: false,
         inStock: true,
@@ -291,7 +291,7 @@ export default function ShopCatalog() {
             <SelectContent>
               <SelectItem value="all" data-testid="selectitem-category-all">All Categories</SelectItem>
               {categories.map((category) => (
-                <SelectItem key={category._id} value={category.name} data-testid={`selectitem-category-${category._id}`}>
+                <SelectItem key={category._id} value={category.slug} data-testid={`selectitem-category-${category._id}`}>
                   {category.name}
                 </SelectItem>
               ))}
@@ -463,7 +463,7 @@ export default function ShopCatalog() {
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category._id} value={category.name} data-testid={`selectitem-product-category-${category._id}`}>
+                    <SelectItem key={category._id} value={category.slug} data-testid={`selectitem-product-category-${category._id}`}>
                       {category.name}
                     </SelectItem>
                   ))}
